@@ -49,7 +49,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(helmet( { contentSecuritypolicy: false }));
+app.use(helmet());
 app.use(mongoSanitize());
  
 const secret = process.env.SECRET || 'thisshouldbeabettersecret!'
@@ -67,6 +67,51 @@ store.on("error", function(e) {
   console.log("SESSION STORE ERROR", e);
 })
 
+const scriptSrcUrls = [
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://api.mapbox.com/",
+  "https://kit.fontawesome.com/",
+  "https://cdnjs.cloudflare.com/",
+  "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+  "https://kit-free.fontawesome.com/",
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.mapbox.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://fonts.googleapis.com/",
+  "https://use.fontawesome.com/",
+];
+const connectSrcUrls = [
+  "https://api.mapbox.com/",
+  "https://a.tiles.mapbox.com/",
+  "https://b.tiles.mapbox.com/",
+  "https://events.mapbox.com/",
+];
+const fontSrcUrls = [];
+app.use(
+  helmet.contentSecurityPolicy({
+      directives: {
+          defaultSrc: [],
+          connectSrc: ["'self'", ...connectSrcUrls],
+          scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+          styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+          workerSrc: ["'self'", "blob:"],
+          objectSrc: [],
+          imgSrc: [
+              "'self'",
+              "blob:",
+              "data:",
+              "https://res.cloudinary.com/douqbebwk/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+              "https://images.unsplash.com/",
+          ],
+          fontSrc: ["'self'", ...fontSrcUrls],
+      },
+  })
+);
+
+
 //setting up session
 const sessionConfig = {
   store,
@@ -79,7 +124,7 @@ const sessionConfig = {
     expires: Date.now() + 1000 * 60 *60 * 24 * 7,   //expiration date of cookie is set to one week(date is in milliseconds so add one week in ms)
     maxAge: 1000 * 60 *60 * 24 * 7,
     HttpOnly: true, //extra security so client cant change scripts
-    secure: true //use only when deployed as it works for https
+    // secure: true //use only when deployed as it works for https
 
   }
 }
@@ -91,6 +136,7 @@ app.use(flash());
 app.use(passport.initialize());  
 app.use(passport.session()); //session should be used before passport.session
 passport.use(new LocalStrategy(User.authenticate()));
+
 
 //static method to store and de-store a user in the session
 passport.serializeUser(User.serializeUser());
