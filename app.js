@@ -49,6 +49,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(helmet( { contentSecuritypolicy: false }));
 app.use(mongoSanitize());
  
 const secret = process.env.SECRET || 'thisshouldbeabettersecret!'
