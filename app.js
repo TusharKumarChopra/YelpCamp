@@ -79,7 +79,7 @@ const sessionConfig = {
     expires: Date.now() + 1000 * 60 *60 * 24 * 7,   //expiration date of cookie is set to one week(date is in milliseconds so add one week in ms)
     maxAge: 1000 * 60 *60 * 24 * 7,
     HttpOnly: true, //extra security so client cant change scripts
-    // secure: true //use only when deployed as it works for https
+    secure: true //use only when deployed as it works for https
 
   }
 }
