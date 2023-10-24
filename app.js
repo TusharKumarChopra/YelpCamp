@@ -49,8 +49,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(helmet());
 app.use(mongoSanitize());
+app.use(helmet());
  
 const secret ='thisshouldbeabettersecret!'
 
@@ -110,7 +110,7 @@ const sessionConfig = {
     //expiration so that user doesnt get logged in forever
     expires: Date.now() + 1000 * 60 *60 * 24 * 7,   //expiration date of cookie is set to one week(date is in milliseconds so add one week in ms)
     maxAge: 1000 * 60 *60 * 24 * 7,
-    HttpOnly: true, //extra security so client cant change scripts
+    httpOnly: true, //extra security so client cant change scripts
     // secure: true //use only when deployed as it works for https
 
   }
@@ -140,20 +140,15 @@ app.use((req, res, next) => {
 })
 
 
-// app.get('/fakeuser', async (req, res) => {
-//   const user = new User({email:'t123@gmail.com', username:'Tushar'})
-//   const newUser = await User.register(user, 'chicken');
-//   res.send(newUser);
-// })
 
 app.get("/", (req, res) => {
   res.render("home");
 });
 
+app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);  //to use router (breaking routes for different models)  
 //every campground route will start from /campgrounds
 app.use('/campgrounds/:id/reviews', reviewRoutes); //similarlly
-app.use('/', userRoutes);
 
 
 app.all("*", (req, res, next) => {
