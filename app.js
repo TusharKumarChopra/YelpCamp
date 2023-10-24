@@ -1,6 +1,6 @@
-if(process.env.NODE_ENV !== 'production') {
+
   require('dotenv').config();
-}
+
 
 const express = require('express');
 const app = express();
@@ -49,7 +49,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(helmet({ contentSecurityPolicy: false }));
 app.use(mongoSanitize());
  
 const secret = process.env.SECRET || 'thisshouldbeabettersecret!'
