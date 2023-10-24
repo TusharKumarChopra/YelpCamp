@@ -31,7 +31,10 @@ main();
 async function main() {
   try {
     //'mongodb://127.0.0.1:27017/yelp-camp'
-    await mongoose.connect(dbUrl);
+    await mongoose.connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
     console.log('Connected to the mongo database successfully');
     
     // Continue with your application logic here
