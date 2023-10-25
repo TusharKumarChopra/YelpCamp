@@ -3,7 +3,6 @@ require('dotenv').config();
 }
 
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -25,26 +24,35 @@ const dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/yelp-camp";
 const campgroundRoutes = require('./routes/campgroundRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const userRoutes = require('./routes/userRoutes');
-
-mongoose.set('strictQuery', true); 
-main();
-async function main() {
-  try {
-    //'mongodb://127.0.0.1:27017/yelp-camp'
-    await mongoose.connect(dbUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    console.log('Connected to the mongo database successfully');
+ 
+// main();
+// async function main() {
+//   try {
+//     //'mongodb://127.0.0.1:27017/yelp-camp'
+//     await mongoose.connect(dbUrl, {
+  //       useNewUrlParser: true,
+  //       useUnifiedTopology: true
+  //     });
+  //     console.log('Connected to the mongo database successfully');
+  
+  //     // Continue with your application logic here
+  //   } catch (err) {
+    //     console.log("oh no mongo error")
+    //     console.error('Error connecting to the database:', err);
+    //   }
+    // }
     
-    // Continue with your application logic here
-  } catch (err) {
-    console.log("oh no mongo error")
-    console.error('Error connecting to the database:', err);
-  }
-}
+mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
 
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("Yelp-Camp DB Connected!");
+});
 
+    
+const app = express();
+    
 app.engine("ejs", ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -53,7 +61,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
-app.use(helmet());
+// app.use(helmet());
  
 const secret ='thisshouldbeabettersecret!'
 
